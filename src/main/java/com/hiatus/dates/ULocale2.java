@@ -2,6 +2,8 @@
 
 package com.hiatus.dates;
 
+import static com.hiatus.dates.DateOrder.*;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
@@ -28,8 +30,6 @@ import java.util.TimeZone;
 *******************************************************************************/
 public class ULocale2
 {
-	public final static int ORDER_DYM = 0, ORDER_DMY = 1, ORDER_MDY = 2, ORDER_MYD = 3, ORDER_YDM = 4, ORDER_YMD = 5;
-
 	private static String[][] s_LangDefaults = {
 					{ "be", "Europe/Minsk" }, // Belarusian default
 					{ "bg", "Europe/Sofia" }, // Bulgarian default
@@ -111,8 +111,8 @@ public class ULocale2
 					{ "VE", "America/Caracas" } // Venezuela - override Spanish default
 	};
 
-	private static Map<String, String> s_OverridesMap = new HashMap<String, String>();
-	private static Map<String, String> s_LangDefaultsMap = new HashMap<String, String>();
+	private static Map<String, String> OVERRIDES = new HashMap<String, String>();
+	private static Map<String, String> LANG_DEFAULTS = new HashMap<String, String>();
 
 	/*******************************************************************************
 	*******************************************************************************/
@@ -122,12 +122,12 @@ public class ULocale2
 
 		for (i = 0; i < s_Overrides.length; i++)
 		{
-			s_OverridesMap.put(s_Overrides[i][0], s_Overrides[i][1]);
+			OVERRIDES.put(s_Overrides[i][0], s_Overrides[i][1]);
 		}
 
 		for (i = 0; i < s_LangDefaults.length; i++)
 		{
-			s_LangDefaultsMap.put(s_LangDefaults[i][0], s_LangDefaults[i][1]);
+			LANG_DEFAULTS.put(s_LangDefaults[i][0], s_LangDefaults[i][1]);
 		}
 	}
 
@@ -139,13 +139,12 @@ public class ULocale2
 
 		try
 		{
-			if (inLocale != null)
-			{
+			if (inLocale != null) {
 				theFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT /* MEDIUM */, inLocale);
 			} else {
 				theFormat = DateFormat.getDateTimeInstance();
 			}
-		} catch (final Exception e)
+		} catch (final IllegalArgumentException e)
 		{
 			theFormat = DateFormat.getDateTimeInstance();
 		}
@@ -163,8 +162,7 @@ public class ULocale2
 
 		try
 		{
-			if (inLocale != null)
-			{
+			if (inLocale != null) {
 				theFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, inTimeFormat, inLocale);
 			} else {
 				theFormat = DateFormat.getDateTimeInstance();
@@ -187,12 +185,11 @@ public class ULocale2
 														// instead of "en"
 		// The "en_gb" problem was noticed using OmniWeb 4 on Mac OS X - May 2001
 
-		if ((theLang.length() >= 5) && (inLocale.getCountry().length() < 1))
+		if (theLang.length() >= 5 && inLocale.getCountry().length() < 1)
 		{
 			final int theUScorePos = theLang.indexOf('_'); // eg. "en_gb"
 
-			if (theUScorePos >= 2)
-			{
+			if (theUScorePos >= 2) {
 				return new Locale(theLang.substring(0, theUScorePos), theLang.substring(theUScorePos + 1));
 			}
 		}
@@ -201,8 +198,7 @@ public class ULocale2
 	}
 
 	/*******************************************************************************
-	 * 29 May 2002
-	 *******************************************************************************/
+	*******************************************************************************/
 	public static String getLocaleHttpHeaderString( final Locale inLocale)
 	{
 		if (inLocale != null)
@@ -215,7 +211,7 @@ public class ULocale2
 
 				if (!theCountry.isEmpty())
 				{
-					return (theLang + "-" + theCountry.toLowerCase());
+					return theLang + "-" + theCountry.toLowerCase();
 				} else {
 					return theLang;
 				}
@@ -237,11 +233,11 @@ public class ULocale2
 	*******************************************************************************/
 	public static Locale stringToLocale( final String inString)
 	{
-		if ( inString != null && inString.length() >= 2)
+		if (inString != null && inString.length() >= 2)
 		{
 			final String theLang = inString.substring(0, 2);
 			final int thePos = inString.indexOf("-");
-			final String theCountry = (thePos >= 0) ? inString.substring(thePos + 1) : "";
+			final String theCountry = thePos >= 0 ? inString.substring(thePos + 1) : "";
 
 			return new Locale(theLang, theCountry);
 		}
@@ -261,8 +257,7 @@ public class ULocale2
 	}
 
 	/*******************************************************************************
-	 * 20 May 2002
-	 *******************************************************************************/
+	*******************************************************************************/
 	public static String getCapitalCityString( final Locale inLocale)
 	{
 		final String theZoneStr = getBestTimeZoneString(inLocale.getLanguage(), inLocale.getCountry());
@@ -285,7 +280,6 @@ public class ULocale2
 	}
 
 	/*******************************************************************************
-	 * 8 April 2002
 	 *******************************************************************************/
 	public static GregorianCalendar getGregorianCalendar( final Locale inLocale)
 	{
@@ -293,9 +287,8 @@ public class ULocale2
 	}
 
 	/***********************************************************************************
-	 * 2 August 2001
 	 ***********************************************************************************/
-	public static int getLocaleDateOrder( final Locale inLocale)
+	public static DateOrder getLocaleDateOrder( final Locale inLocale)
 	{
 		final SimpleDateFormat theFmt = (SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT, inLocale);
 		final String thePattern = theFmt.toPattern().toLowerCase(Locale.UK); // simple Lowercase
@@ -303,17 +296,17 @@ public class ULocale2
 		final int theLoc_M = thePattern.indexOf('m');
 		final int theLoc_Y = thePattern.indexOf('y');
 
-		if ((theLoc_D < theLoc_Y) && (theLoc_Y < theLoc_M)) {
+		if (theLoc_D < theLoc_Y && theLoc_Y < theLoc_M) {
 			return ORDER_DYM;
-		} else if ((theLoc_D < theLoc_M) && (theLoc_M < theLoc_Y)) {
+		} else if (theLoc_D < theLoc_M && theLoc_M < theLoc_Y) {
 			return ORDER_DMY;
-		} else if ((theLoc_Y < theLoc_D) && (theLoc_D < theLoc_M)) {
+		} else if (theLoc_Y < theLoc_D && theLoc_D < theLoc_M) {
 			return ORDER_YDM;
-		} else if ((theLoc_Y < theLoc_M) && (theLoc_M < theLoc_D)) {
+		} else if (theLoc_Y < theLoc_M && theLoc_M < theLoc_D) {
 			return ORDER_YMD;
-		} else if ((theLoc_M < theLoc_D) && (theLoc_D < theLoc_Y)) {
+		} else if (theLoc_M < theLoc_D && theLoc_D < theLoc_Y) {
 			return ORDER_MDY;
-		} else if ((theLoc_M < theLoc_Y) && (theLoc_Y < theLoc_D)) {
+		} else if (theLoc_M < theLoc_Y && theLoc_Y < theLoc_D) {
 			return ORDER_MYD;
 		} else {
 			return ORDER_DYM;
@@ -328,7 +321,7 @@ public class ULocale2
 
 		if (inCountry.length() > 0) // 8 August 2001 !
 		{
-			theZoneStr = s_OverridesMap.get(inCountry);
+			theZoneStr = OVERRIDES.get(inCountry);
 			if (theZoneStr != null)
 			{
 				return theZoneStr;
@@ -355,17 +348,16 @@ public class ULocale2
 
 		// ////////////////////////////////////// Language fall-throughs
 
-		theZoneStr = s_LangDefaultsMap.get(inLang);
-		return (theZoneStr != null) ? theZoneStr : "";
+		theZoneStr = LANG_DEFAULTS.get(inLang);
+		return theZoneStr != null ? theZoneStr : "";
 	}
 
 	/*******************************************************************************
-	 * 2 August 2001
-	 *******************************************************************************/
-	public static void joinDateEntryParts( final Locale inLocale, final StringBuilder ioBuf,
+	*******************************************************************************/
+	protected static void joinDateEntryParts( final Locale inLocale, final StringBuilder ioBuf,
 					final StringBuilder inDBuf, final StringBuilder inMBuf, final StringBuilder inYBuf)
 	{
-		final int theOrder = getLocaleDateOrder(inLocale);
+		final DateOrder theOrder = getLocaleDateOrder(inLocale);
 
 		if (theOrder == ORDER_DMY) {
 			ioBuf.append(inDBuf).append(inMBuf).append(inYBuf);

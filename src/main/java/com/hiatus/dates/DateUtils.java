@@ -24,9 +24,6 @@ public final class DateUtils implements DateConstants
 
 	private static NumberFormat SECONDS_FORMAT;
 
-	/*******************************************************************************
-	 * 3 May 2002
-	 *******************************************************************************/
 	static
 	{
 		SECONDS_FORMAT = NumberFormat.getNumberInstance(Locale.UK);
@@ -34,13 +31,12 @@ public final class DateUtils implements DateConstants
 	}
 
 	/*******************************************************************************
-	 * 19 June 2001
 	 *******************************************************************************/
 	public static long checkDateValidity( final int inDay, final int inMonth, final int inYear)
 	{
 		long theResult = DATE_OK;
 
-		if ((inYear < 1900) || (inYear > 2010))
+		if (inYear < 1900 || inYear > 2010)
 		{
 			// FIXME Logger.getLogger("Main").warn("Bad year specified: " + inYear);
 
@@ -55,19 +51,19 @@ public final class DateUtils implements DateConstants
 
 			// ////////////////////////////////////// We use this test to catch things like the 31st February!
 
-			final boolean dateWasWrong = ((theCalendar.get(YEAR) != inYear) ||
-							(theCalendar.get(MONTH) != inMonth) ||
-							(theCalendar.get(DAY_OF_MONTH) != inDay));
+			final boolean dateWasWrong = theCalendar.get(YEAR) != inYear ||
+							theCalendar.get(MONTH) != inMonth ||
+							theCalendar.get(DAY_OF_MONTH) != inDay;
 
 			if (dateWasWrong ||
-							(inDay < theCalendar.getMinimum(DAY_OF_MONTH)) || // well, 1
-							(inDay > theCalendar.getMaximum(DAY_OF_MONTH))) // well, 31
+							inDay < theCalendar.getMinimum(DAY_OF_MONTH) || // well, 1
+							inDay > theCalendar.getMaximum(DAY_OF_MONTH)) // well, 31
 			{
 				theResult |= BAD_DATE_DAY;
 			}
 
-			if ((inMonth < theCalendar.getMinimum(MONTH)) || // well, 0
-							(inMonth > theCalendar.getMaximum(MONTH)))
+			if (inMonth < theCalendar.getMinimum(MONTH) || // well, 0
+							inMonth > theCalendar.getMaximum(MONTH))
 			{
 				theResult |= BAD_DATE_MONTH;
 			}
@@ -98,11 +94,10 @@ public final class DateUtils implements DateConstants
 		theCalendarA.setTime(inA);
 		theCalendarB.setTime(inB);
 
-		return ((theCalendarA.get(YEAR) == theCalendarB.get(YEAR)) && (theCalendarA.get(MONTH) == theCalendarB.get(MONTH)) && (theCalendarA.get(DAY_OF_MONTH) == theCalendarB.get(DAY_OF_MONTH)));
+		return theCalendarA.get(YEAR) == theCalendarB.get(YEAR) && theCalendarA.get(MONTH) == theCalendarB.get(MONTH) && theCalendarA.get(DAY_OF_MONTH) == theCalendarB.get(DAY_OF_MONTH);
 	}
 
 	/*******************************************************************************
-	 * 24 March 2002
 	 *******************************************************************************/
 	public static Timestamp getCurrentTimestamp()
 	{
@@ -147,13 +142,13 @@ public final class DateUtils implements DateConstants
 		final int theYear_A = inCal_A.get(YEAR);
 		final int theYear_B = inCal_B.get(YEAR);
 
-		if (((inCal_A.get(DAY_OF_MONTH) == inCal_B.get(DAY_OF_MONTH)) && (inCal_A.get(MONTH) == inCal_B.get(MONTH))) || (doyA == doyB))
+		if (inCal_A.get(DAY_OF_MONTH) == inCal_B.get(DAY_OF_MONTH) && inCal_A.get(MONTH) == inCal_B.get(MONTH) || doyA == doyB)
 		{
 			return Math.abs(theYear_A - theYear_B);
 		}
 		else
 		{
-			final double theFractBit = ((double) Math.abs(doyA - doyB)) / (double) inCal_A.getActualMaximum(DAY_OF_YEAR);
+			final double theFractBit = (double) Math.abs(doyA - doyB) / (double) inCal_A.getActualMaximum(DAY_OF_YEAR);
 
 			if (theYear_A == theYear_B)
 			{
@@ -162,7 +157,7 @@ public final class DateUtils implements DateConstants
 
 			final double theYearBit = Math.abs(theYear_A - theYear_B);
 
-			if (((theYear_A > theYear_B) && (doyA > doyB)) || ((theYear_A < theYear_B) && (doyA < doyB)))
+			if (theYear_A > theYear_B && doyA > doyB || theYear_A < theYear_B && doyA < doyB)
 			{
 				return theYearBit + theFractBit;
 			}
@@ -187,16 +182,15 @@ public final class DateUtils implements DateConstants
 	 *******************************************************************************/
 	public static int getAgeIfBirthdayToday( final Calendar inBirthCalendar, final Calendar inTodaysCalendar)
 	{
-		if ((inTodaysCalendar.get(DAY_OF_MONTH) == inBirthCalendar.get(DAY_OF_MONTH)) && (inTodaysCalendar.get(MONTH) == inBirthCalendar.get(MONTH)))
+		if (inTodaysCalendar.get(DAY_OF_MONTH) == inBirthCalendar.get(DAY_OF_MONTH) && inTodaysCalendar.get(MONTH) == inBirthCalendar.get(MONTH))
 		{
-			return (inTodaysCalendar.get(YEAR) - inBirthCalendar.get(YEAR));
+			return inTodaysCalendar.get(YEAR) - inBirthCalendar.get(YEAR);
 		} else {
 			return -1;
 		}
 	}
 
 	/*******************************************************************************
-	 * 1 August 2002
 	 *******************************************************************************/
 	public static int getActualAgeInYears( final Locale inLocale, final java.sql.Date inDate)
 	{
@@ -215,15 +209,15 @@ public final class DateUtils implements DateConstants
 		}
 		else
 		{
-			if ((theTodaysCalendar.get(MONTH) > theBirthCalendar.get(MONTH)) ||
-							((theTodaysCalendar.get(MONTH) == theBirthCalendar.get(MONTH)) &&
-							(theTodaysCalendar.get(DAY_OF_MONTH) >= theBirthCalendar.get(DAY_OF_MONTH))))
+			if (theTodaysCalendar.get(MONTH) > theBirthCalendar.get(MONTH) ||
+							theTodaysCalendar.get(MONTH) == theBirthCalendar.get(MONTH) &&
+							theTodaysCalendar.get(DAY_OF_MONTH) >= theBirthCalendar.get(DAY_OF_MONTH))
 			{
-				return (theTodaysCalendar.get(YEAR) - theBirthCalendar.get(YEAR));
+				return theTodaysCalendar.get(YEAR) - theBirthCalendar.get(YEAR);
 			}
 			else
 			{
-				return (theTodaysCalendar.get(YEAR) - theBirthCalendar.get(YEAR) - 1);
+				return theTodaysCalendar.get(YEAR) - theBirthCalendar.get(YEAR) - 1;
 			}
 		}
 	}
@@ -237,7 +231,7 @@ public final class DateUtils implements DateConstants
 		// the calculation result to be potentially one too high.
 		// Introduced fp arithmetic. How does this affect >= 1970 dates, if at all ???
 
-		double theNumDays = ((double) inDate.getTime() / (double) MSECS_IN_DAY);
+		double theNumDays = (double) inDate.getTime() / (double) MSECS_IN_DAY;
 
 		theNumDays += 719528;
 
@@ -250,7 +244,7 @@ public final class DateUtils implements DateConstants
 	{
 		// 9 July 2002. Fine - current year definitely after 1970 epoch
 
-		return (System.currentTimeMillis() / MSECS_IN_DAY) + 719528;
+		return System.currentTimeMillis() / MSECS_IN_DAY + 719528;
 	}
 
 	/*******************************************************************************
@@ -285,7 +279,6 @@ public final class DateUtils implements DateConstants
 	}
 
 	/*******************************************************************************
-	 * 1 May 2002
 	 *******************************************************************************/
 	public static StringBuilder getFormattedTimeDiff( final long inDiffMSecs, final boolean inUseSeconds, final boolean inUseMSecs)
 	{
@@ -322,7 +315,7 @@ public final class DateUtils implements DateConstants
 						theHrs %= 24L;
 					}
 
-					if ((theHrs >= 1L) && (theBuf.length() > 0))
+					if (theHrs >= 1L && theBuf.length() > 0)
 					{
 						theBuf.append(", ");
 					}
@@ -338,7 +331,7 @@ public final class DateUtils implements DateConstants
 
 				}
 
-				if ((theMins >= 1L) && (theBuf.length() > 0))
+				if (theMins >= 1L && theBuf.length() > 0)
 				{
 					theBuf.append(", ");
 				}
@@ -354,7 +347,7 @@ public final class DateUtils implements DateConstants
 
 			}
 
-			if ((inUseSeconds) && (theSecs > 0.0D))
+			if (inUseSeconds && theSecs > 0.0D)
 			{
 				if (theBuf.length() > 0)
 				{
@@ -402,7 +395,7 @@ public final class DateUtils implements DateConstants
 	{
 		final long theDifferenceinMsecs = getDatesDifferenceMsecs(inA_Msecs, inB_Msecs);
 
-		return (theDifferenceinMsecs / MSECS_IN_DAY);
+		return theDifferenceinMsecs / MSECS_IN_DAY;
 	}
 
 	/*******************************************************************************
@@ -411,14 +404,13 @@ public final class DateUtils implements DateConstants
 	{
 		if (inA_Msecs > inB_Msecs)
 		{
-			return (inA_Msecs - inB_Msecs);
+			return inA_Msecs - inB_Msecs;
 		}
 
-		return (inB_Msecs - inA_Msecs);
+		return inB_Msecs - inA_Msecs;
 	}
 
 	/*******************************************************************************
-	 * 4 July 2002
 	 *******************************************************************************/
 	public static Calendar getCalendarJustFromDate( final java.util.Date inDate)
 	{
