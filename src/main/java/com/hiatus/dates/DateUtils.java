@@ -1,5 +1,7 @@
 package com.hiatus.dates;
 
+import static java.util.Calendar.*;
+
 import java.sql.Timestamp;
 import java.text.DateFormatSymbols;
 import java.text.NumberFormat;
@@ -53,19 +55,19 @@ public class DateUtils implements DateConstants
 
 			// ////////////////////////////////////// We use this test to catch things like the 31st February!
 
-			final boolean dateWasWrong = ((theCalendar.get(Calendar.YEAR) != inYear) ||
-							(theCalendar.get(Calendar.MONTH) != inMonth) ||
-							(theCalendar.get(Calendar.DAY_OF_MONTH) != inDay));
+			final boolean dateWasWrong = ((theCalendar.get(YEAR) != inYear) ||
+							(theCalendar.get(MONTH) != inMonth) ||
+							(theCalendar.get(DAY_OF_MONTH) != inDay));
 
 			if (dateWasWrong ||
-							(inDay < theCalendar.getMinimum(Calendar.DAY_OF_MONTH)) || // well, 1
-							(inDay > theCalendar.getMaximum(Calendar.DAY_OF_MONTH))) // well, 31
+							(inDay < theCalendar.getMinimum(DAY_OF_MONTH)) || // well, 1
+							(inDay > theCalendar.getMaximum(DAY_OF_MONTH))) // well, 31
 			{
 				theResult |= BAD_DATE_DAY;
 			}
 
-			if ((inMonth < theCalendar.getMinimum(Calendar.MONTH)) || // well, 0
-							(inMonth > theCalendar.getMaximum(Calendar.MONTH)))
+			if ((inMonth < theCalendar.getMinimum(MONTH)) || // well, 0
+							(inMonth > theCalendar.getMaximum(MONTH)))
 			{
 				theResult |= BAD_DATE_MONTH;
 			}
@@ -76,7 +78,7 @@ public class DateUtils implements DateConstants
 
 	/*******************************************************************************
 	 *******************************************************************************/
-	public static java.sql.Date DMYtoSqlDate( final int inD, final int inM, final int inY)
+	public static java.sql.Date convertDmyToSqlDate( final int inD, final int inM, final int inY)
 	{
 		final Calendar theCalendar = Calendar.getInstance();
 		theCalendar.set(inY, inM, inD);
@@ -96,8 +98,7 @@ public class DateUtils implements DateConstants
 		theCalendarA.setTime(inA);
 		theCalendarB.setTime(inB);
 
-		return ((theCalendarA.get(Calendar.YEAR) == theCalendarB.get(Calendar.YEAR)) &&
-						(theCalendarA.get(Calendar.MONTH) == theCalendarB.get(Calendar.MONTH)) && (theCalendarA.get(Calendar.DAY_OF_MONTH) == theCalendarB.get(Calendar.DAY_OF_MONTH)));
+		return ((theCalendarA.get(YEAR) == theCalendarB.get(YEAR)) && (theCalendarA.get(MONTH) == theCalendarB.get(MONTH)) && (theCalendarA.get(DAY_OF_MONTH) == theCalendarB.get(DAY_OF_MONTH)));
 	}
 
 	/*******************************************************************************
@@ -110,39 +111,22 @@ public class DateUtils implements DateConstants
 
 	/*******************************************************************************
 	 *******************************************************************************/
-	public static long GetDatesDifference_Days( final java.sql.Date inA, final long inB_Msecs)
+	public static long getDatesDifferenceDays( final java.sql.Date inA, final long inB_Msecs)
 	{
-		return GetDatesDifference_Days(inA.getTime(), inB_Msecs);
+		return getDatesDifferenceDays(inA.getTime(), inB_Msecs);
 	}
 
 	/*******************************************************************************
 	 *******************************************************************************/
-	public static double GetDatesDifference_Years( final long inA_Msecs, final long inB_Msecs)
+	public static double getDatesDifferenceYears( final long inA_Msecs, final long inB_Msecs)
 	{
-		// double theResult;
+		final GregorianCalendar calA = ULocale2.getGregorianCalendar(Locale.ENGLISH);
+		final GregorianCalendar calB = ULocale2.getGregorianCalendar(Locale.ENGLISH);
 
-		// if (System.getProperty("java.version").startsWith("1.4")) // JDK 1.4
-		{
-			final GregorianCalendar theCalendar_A = ULocale2.getGregorianCalendar(Locale.ENGLISH);
-			final GregorianCalendar theCalendar_B = ULocale2.getGregorianCalendar(Locale.ENGLISH);
+		calA.setTimeInMillis(inA_Msecs);
+		calB.setTimeInMillis(inB_Msecs);
 
-			theCalendar_A.setTime(new Date(inA_Msecs)); // yuk
-			theCalendar_B.setTime(new Date(inB_Msecs)); // yuk
-
-			/* theResult = */return getCalendarDifference_Years(theCalendar_A, theCalendar_B);
-		}
-		/*
-		 * else { com.ibm.icu.util.Calendar theCalendar_A = ULocale.getCalendar( Locale.ENGLISH );
-		 * com.ibm.icu.util.Calendar theCalendar_B = ULocale.getCalendar( Locale.ENGLISH );
-		 * 
-		 * theCalendar_A.setTimeInMillis(inA_Msecs); theCalendar_B.setTimeInMillis(inB_Msecs);
-		 * 
-		 * return getCalendarDifference_Years( theCalendar_A, theCalendar_B); }
-		 */
-		// log_info("(2) new val = " + theResult + ", old was " + ( GetDatesDifference_Days( inA_Msecs, inB_Msecs) /
-		// DAYS_IN_YEAR));
-
-		// return theResult;
+		return getCalendarDifference_Years(calA, calB);
 	}
 
 	/*******************************************************************************
@@ -155,31 +139,21 @@ public class DateUtils implements DateConstants
 	}
 
 	/*******************************************************************************
-	 ****************************************************************************** 
-	 public static double getCurrentAge_Years( com.ibm.icu.util.Calendar inBirthDate) { com.ibm.icu.util.Calendar
-	 * theCurrDate = ULocale.getCalendar( Locale.ENGLISH );
-	 * 
-	 * return getCalendarDifference_Years( inBirthDate, theCurrDate); }
-	 */
-
-	/*******************************************************************************
 	 *******************************************************************************/
 	public static double getCalendarDifference_Years( final java.util.GregorianCalendar inCal_A, final java.util.GregorianCalendar inCal_B)
 	{
-		final int theDOY_A = inCal_A.get(Calendar.DAY_OF_YEAR);
-		final int theDOY_B = inCal_B.get(Calendar.DAY_OF_YEAR);
-		final int theYear_A = inCal_A.get(Calendar.YEAR);
-		final int theYear_B = inCal_B.get(Calendar.YEAR);
+		final int doyA = inCal_A.get(Calendar.DAY_OF_YEAR);
+		final int doyB = inCal_B.get(Calendar.DAY_OF_YEAR);
+		final int theYear_A = inCal_A.get(YEAR);
+		final int theYear_B = inCal_B.get(YEAR);
 
-		if (((inCal_A.get(Calendar.DAY_OF_MONTH) == inCal_B.get(Calendar.DAY_OF_MONTH)) &&
-						(inCal_A.get(Calendar.MONTH) == inCal_B.get(Calendar.MONTH))) ||
-						(theDOY_A == theDOY_B))
+		if (((inCal_A.get(DAY_OF_MONTH) == inCal_B.get(DAY_OF_MONTH)) && (inCal_A.get(MONTH) == inCal_B.get(MONTH))) || (doyA == doyB))
 		{
 			return Math.abs(theYear_A - theYear_B);
 		}
 		else
 		{
-			final double theFractBit = ((double) Math.abs(theDOY_A - theDOY_B)) / (double) inCal_A.getActualMaximum(Calendar.DAY_OF_YEAR);
+			final double theFractBit = ((double) Math.abs(doyA - doyB)) / (double) inCal_A.getActualMaximum(Calendar.DAY_OF_YEAR);
 
 			if (theYear_A == theYear_B)
 			{
@@ -188,8 +162,7 @@ public class DateUtils implements DateConstants
 
 			final double theYearBit = Math.abs(theYear_A - theYear_B);
 
-			if (((theYear_A > theYear_B) && (theDOY_A > theDOY_B)) ||
-							((theYear_A < theYear_B) && (theDOY_A < theDOY_B)))
+			if (((theYear_A > theYear_B) && (doyA > doyB)) || ((theYear_A < theYear_B) && (doyA < doyB)))
 			{
 				return theYearBit + theFractBit;
 			}
@@ -197,27 +170,6 @@ public class DateUtils implements DateConstants
 			return theYearBit - theFractBit;
 		}
 	}
-
-	/*******************************************************************************
-	 ****************************************************************************** 
-	 public static double getCalendarDifference_Years( com.ibm.icu.util.Calendar inCal_A, com.ibm.icu.util.Calendar
-	 * inCal_B) { int theDOY_A = inCal_A.get(Calendar.DAY_OF_YEAR); int theDOY_B = inCal_B.get(Calendar.DAY_OF_YEAR);
-	 * int theYear_A = inCal_A.get(Calendar.YEAR); int theYear_B = inCal_B.get(Calendar.YEAR);
-	 * 
-	 * if ((( inCal_A.get(Calendar.DAY_OF_MONTH) == inCal_B.get(Calendar.DAY_OF_MONTH)) && ( inCal_A.get(Calendar.MONTH)
-	 * == inCal_B.get(Calendar.MONTH))) || ( theDOY_A == theDOY_B)) { return (double) Math.abs( theYear_A - theYear_B);
-	 * } else { double theFractBit = ((double) Math.abs( theDOY_A - theDOY_B)) / (double)
-	 * inCal_A.getActualMaximum(Calendar.DAY_OF_YEAR);
-	 * 
-	 * if ( theYear_A == theYear_B) { return theFractBit; }
-	 * 
-	 * double theYearBit = (double) Math.abs( theYear_A - theYear_B);
-	 * 
-	 * if ((( theYear_A > theYear_B) && ( theDOY_A > theDOY_B)) || (( theYear_A < theYear_B) && ( theDOY_A < theDOY_B)))
-	 * { return theYearBit + theFractBit; }
-	 * 
-	 * return theYearBit - theFractBit; } }
-	 */
 
 	/*******************************************************************************
 	 *******************************************************************************/
@@ -228,17 +180,16 @@ public class DateUtils implements DateConstants
 
 		theBirthCalendar.setTime(inDate);
 
-		return _getAgeIfBirthdayToday(theBirthCalendar, theTodaysCalendar);
+		return getAgeIfBirthdayToday(theBirthCalendar, theTodaysCalendar);
 	}
 
 	/*******************************************************************************
 	 *******************************************************************************/
-	private static int _getAgeIfBirthdayToday( final Calendar inBirthCalendar, final Calendar inTodaysCalendar)
+	private static int getAgeIfBirthdayToday( final Calendar inBirthCalendar, final Calendar inTodaysCalendar)
 	{
-		if ((inTodaysCalendar.get(Calendar.DAY_OF_MONTH) == inBirthCalendar.get(Calendar.DAY_OF_MONTH)) &&
-						(inTodaysCalendar.get(Calendar.MONTH) == inBirthCalendar.get(Calendar.MONTH)))
+		if ((inTodaysCalendar.get(DAY_OF_MONTH) == inBirthCalendar.get(DAY_OF_MONTH)) && (inTodaysCalendar.get(MONTH) == inBirthCalendar.get(MONTH)))
 		{
-			return (inTodaysCalendar.get(Calendar.YEAR) - inBirthCalendar.get(Calendar.YEAR));
+			return (inTodaysCalendar.get(YEAR) - inBirthCalendar.get(YEAR));
 		} else {
 			return -1;
 		}
@@ -256,31 +207,23 @@ public class DateUtils implements DateConstants
 
 		// ////////////////////////////////////
 
-		final int theExactYears = _getAgeIfBirthdayToday(theBirthCalendar, theTodaysCalendar);
+		final int theExactYears = getAgeIfBirthdayToday(theBirthCalendar, theTodaysCalendar);
 
 		if (theExactYears >= 0) // a birthday. return that age
 		{
-			// debug("GAAIY(a): \"" + inDate + "\" ==> " + theExactYears);
-
 			return theExactYears;
 		}
 		else
 		{
-			if ((theTodaysCalendar.get(Calendar.MONTH) > theBirthCalendar.get(Calendar.MONTH)) ||
-							((theTodaysCalendar.get(Calendar.MONTH) == theBirthCalendar.get(Calendar.MONTH)) &&
-							(theTodaysCalendar.get(Calendar.DAY_OF_MONTH) >= theBirthCalendar.get(Calendar.DAY_OF_MONTH))))
+			if ((theTodaysCalendar.get(MONTH) > theBirthCalendar.get(MONTH)) ||
+							((theTodaysCalendar.get(MONTH) == theBirthCalendar.get(MONTH)) &&
+							(theTodaysCalendar.get(DAY_OF_MONTH) >= theBirthCalendar.get(DAY_OF_MONTH))))
 			{
-				// debug("GAAIY(b): \"" + inDate + "\" ==> " + ( theTodaysCalendar.get(Calendar.YEAR) -
-				// theBirthCalendar.get(Calendar.YEAR)));
-
-				return (theTodaysCalendar.get(Calendar.YEAR) - theBirthCalendar.get(Calendar.YEAR));
+				return (theTodaysCalendar.get(YEAR) - theBirthCalendar.get(YEAR));
 			}
 			else
 			{
-				// debug("GAAIY(c): \"" + inDate + "\" ==> " + ( theTodaysCalendar.get(Calendar.YEAR) -
-				// theBirthCalendar.get(Calendar.YEAR) - 1));
-
-				return (theTodaysCalendar.get(Calendar.YEAR) - theBirthCalendar.get(Calendar.YEAR) - 1);
+				return (theTodaysCalendar.get(YEAR) - theBirthCalendar.get(YEAR) - 1);
 			}
 		}
 	}
@@ -296,9 +239,7 @@ public class DateUtils implements DateConstants
 
 		double theNumDays = ((double) inDate.getTime() / (double) MSECS_IN_DAY);
 
-		// debug("//// theNumDays.1 = " + theNumDays);
 		theNumDays += 719528;
-		// debug("//// theNumDays.2 = " + theNumDays + " !!!");
 
 		return (long) theNumDays;
 	}
@@ -440,39 +381,33 @@ public class DateUtils implements DateConstants
 
 	/*******************************************************************************
 	 *******************************************************************************/
-	public static long GetDatesDifference_ExactDays( final java.util.Date inA, final java.util.Date inB)
+	public static long getDatesDifference_ExactDays( final java.util.Date inA, final java.util.Date inB)
 	{
 		final Calendar theCal_A = getCalendarJustFromDate(inA);
 		final Calendar theCal_B = getCalendarJustFromDate(inB);
 
-		// Logger.getLogger("Main").info("GetDatesDifference_ExactDays: was... " + inA + ", and " + inB);
-		// Logger.getLogger("Main").info("GetDatesDifference_ExactDays:  is... " + theCal_A.getTime() + ", and " +
-		// theCal_B.getTime());
-
-		return GetDatesDifference_Days(theCal_A.getTime(), theCal_B.getTime());
+		return getDatesDifferenceDays(theCal_A.getTime(), theCal_B.getTime());
 	}
 
 	/*******************************************************************************
 	 *******************************************************************************/
-	public static long GetDatesDifference_Days( final java.util.Date inA, final java.util.Date inB)
+	public static long getDatesDifferenceDays( final java.util.Date inA, final java.util.Date inB)
 	{
-		return GetDatesDifference_Days(inA.getTime(), inB.getTime());
+		return getDatesDifferenceDays(inA.getTime(), inB.getTime());
 	}
 
 	/*******************************************************************************
 	 *******************************************************************************/
-	public static long GetDatesDifference_Days( final long inA_Msecs, final long inB_Msecs)
+	public static long getDatesDifferenceDays( final long inA_Msecs, final long inB_Msecs)
 	{
-		final long theDifferenceinMsecs = GetDatesDifference_Msecs(inA_Msecs, inB_Msecs);
-
-		// Logger.getLogger("Main").info("theDifferenceinMsecs... " + theDifferenceinMsecs);
+		final long theDifferenceinMsecs = getDatesDifferenceMsecs(inA_Msecs, inB_Msecs);
 
 		return (theDifferenceinMsecs / MSECS_IN_DAY);
 	}
 
 	/*******************************************************************************
 	 *******************************************************************************/
-	public static long GetDatesDifference_Msecs( final long inA_Msecs, final long inB_Msecs)
+	public static long getDatesDifferenceMsecs( final long inA_Msecs, final long inB_Msecs)
 	{
 		if (inA_Msecs > inB_Msecs)
 		{
@@ -489,21 +424,11 @@ public class DateUtils implements DateConstants
 	{
 		final Calendar theCal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
-		// Logger.getLogger("Main").info(">>> getCalendarJustFromDate:: WAS " + theCal);
-
 		theCal.setTime(inDate);
-		theCal.set(Calendar.HOUR, 0);
-		theCal.set(Calendar.MINUTE, 0);
-		theCal.set(Calendar.SECOND, 0);
-
-		// if ( theCal.get(Calendar.MILLISECOND) != 0)
-		{
-			// Logger.getLogger("Main").info(">>> cleared MILLISECOND from " + theCal.get(Calendar.MILLISECOND));
-
-			theCal.set(Calendar.MILLISECOND, 0);
-		}
-
-		// Logger.getLogger("Main").info(">>> getCalendarJustFromDate:: NOW " + theCal);
+		theCal.set(HOUR, 0);
+		theCal.set(MINUTE, 0);
+		theCal.set(SECOND, 0);
+		theCal.set(MILLISECOND, 0);
 
 		return theCal;
 	}
