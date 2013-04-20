@@ -115,8 +115,8 @@ public final class DateUtils implements DateConstants
 	 *******************************************************************************/
 	public static double getDatesDifferenceYears( final long inA_Msecs, final long inB_Msecs)
 	{
-		final GregorianCalendar calA = ULocale2.getGregorianCalendar(Locale.ENGLISH);
-		final GregorianCalendar calB = ULocale2.getGregorianCalendar(Locale.ENGLISH);
+		final GregorianCalendar calA = LocaleUtils.getGregorianCalendar(Locale.ENGLISH);
+		final GregorianCalendar calB = LocaleUtils.getGregorianCalendar(Locale.ENGLISH);
 
 		calA.setTimeInMillis(inA_Msecs);
 		calB.setTimeInMillis(inB_Msecs);
@@ -126,16 +126,16 @@ public final class DateUtils implements DateConstants
 
 	/*******************************************************************************
 	 *******************************************************************************/
-	public static double getCurrentAge_Years( final java.util.GregorianCalendar inBirthDate)
+	public static double getCurrentAge_Years( final GregorianCalendar inBirthDate)
 	{
-		final java.util.GregorianCalendar theCurrDate = ULocale2.getGregorianCalendar(Locale.ENGLISH);
+		final GregorianCalendar theCurrDate = LocaleUtils.getGregorianCalendar(Locale.ENGLISH);
 
 		return getCalendarDifference_Years(inBirthDate, theCurrDate);
 	}
 
 	/*******************************************************************************
 	 *******************************************************************************/
-	public static double getCalendarDifference_Years( final java.util.GregorianCalendar inCal_A, final java.util.GregorianCalendar inCal_B)
+	public static double getCalendarDifference_Years( final GregorianCalendar inCal_A, final GregorianCalendar inCal_B)
 	{
 		final int doyA = inCal_A.get(DAY_OF_YEAR);
 		final int doyB = inCal_B.get(DAY_OF_YEAR);
@@ -185,9 +185,9 @@ public final class DateUtils implements DateConstants
 		if (inTodaysCalendar.get(DAY_OF_MONTH) == inBirthCalendar.get(DAY_OF_MONTH) && inTodaysCalendar.get(MONTH) == inBirthCalendar.get(MONTH))
 		{
 			return inTodaysCalendar.get(YEAR) - inBirthCalendar.get(YEAR);
-		} else {
-			return -1;
 		}
+
+		return -1;
 	}
 
 	/*******************************************************************************
@@ -256,23 +256,23 @@ public final class DateUtils implements DateConstants
 		return theSymbols.getMonths()[inIndex];
 	}
 
-	public static StringBuilder getFormattedTimeDiff( final long inDiffMSecs) {
+	public static String getFormattedTimeDiff( final long inDiffMSecs) {
 		return getFormattedTimeDiff(inDiffMSecs, true, true);
 	}
 
-	public static StringBuilder getFormattedTimeNanosDiff( final long inDiffNanos) {
+	public static String getFormattedTimeNanosDiff( final long inDiffNanos) {
 		return getFormattedTimeNanosDiff(inDiffNanos, true, true);
 	}
 
-	public static StringBuilder getFormattedTimeNanosDiff( final long inDiffNanos, final boolean inUseSeconds, final boolean inUseMSecs) {
+	public static String getFormattedTimeNanosDiff( final long inDiffNanos, final boolean inUseSeconds, final boolean inUseMSecs) {
 		if (inDiffNanos < 1000L) {
-			return new StringBuilder(50).append(inDiffNanos).append(" nanos");
+			return new StringBuilder(11).append(inDiffNanos).append(" nanos").toString();
 		}
 
 		final long theMicros = inDiffNanos / 1000L;
 
 		if (theMicros < 1000L) {
-			return new StringBuilder(50).append(theMicros).append(" micros");
+			return new StringBuilder(11).append(theMicros).append(" micros").toString();
 		}
 
 		return getFormattedTimeDiff(theMicros / 1000L, inUseSeconds, inUseMSecs);
@@ -280,7 +280,7 @@ public final class DateUtils implements DateConstants
 
 	/*******************************************************************************
 	 *******************************************************************************/
-	public static StringBuilder getFormattedTimeDiff( final long inDiffMSecs, final boolean inUseSeconds, final boolean inUseMSecs)
+	public static String getFormattedTimeDiff( final long inDiffMSecs, final boolean inUseSeconds, final boolean inUseMSecs)
 	{
 		final StringBuilder theBuf = new StringBuilder(200);
 
@@ -369,7 +369,7 @@ public final class DateUtils implements DateConstants
 			theBuf.append(inDiffMSecs).append(" msecs");
 		}
 
-		return theBuf;
+		return theBuf.toString();
 	}
 
 	/*******************************************************************************

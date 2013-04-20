@@ -28,8 +28,11 @@ import java.util.TimeZone;
 
 /*******************************************************************************
 *******************************************************************************/
-public class ULocale2
+public final class LocaleUtils
 {
+	private LocaleUtils() {
+	}
+
 	private static String[][] s_LangDefaults = {
 					{ "be", "Europe/Minsk" }, // Belarusian default
 					{ "bg", "Europe/Sofia" }, // Bulgarian default
@@ -319,9 +322,12 @@ public class ULocale2
 	{
 		String theZoneStr;
 
-		if (inCountry.length() > 0) // 8 August 2001 !
+		final int dotPos = inCountry.indexOf('.');
+		final String uppercaseCountry = dotPos >= 0 ? inCountry.substring(0, dotPos).toUpperCase() : inCountry.toUpperCase();
+
+		if (uppercaseCountry.length() > 0) // 8 August 2001 !
 		{
-			theZoneStr = OVERRIDES.get(inCountry);
+			theZoneStr = OVERRIDES.get(uppercaseCountry);
 			if (theZoneStr != null)
 			{
 				return theZoneStr;
@@ -330,17 +336,17 @@ public class ULocale2
 
 		// //////////////////////////////////////////////////////////////////////////////
 
-		if (inCountry.equals("FI") || // definitely Finland
+		if (uppercaseCountry.equals("FI") || // definitely Finland
 						inLang.equals("fi")) // Finland - could be default or Swedish
 		{
 			return "Europe/Helsinki";
 		}
-		else if (inCountry.equals("ZA") || // South Africa (eg. for English)
+		else if (uppercaseCountry.equals("ZA") || // South Africa (eg. for English)
 						inLang.equals("af")) // or Afrikaans
 		{
 			return "Africa/Johannesburg";
 		}
-		else if (inCountry.equals("IE") || // Eire - override English default
+		else if (uppercaseCountry.equals("IE") || // Eire - override English default
 						inLang.equals("ga")) // or Irish Gaelic
 		{
 			return "Europe/Dublin";
