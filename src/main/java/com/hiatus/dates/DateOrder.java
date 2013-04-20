@@ -7,5 +7,5 @@ package com.hiatus.dates;
  * 
  */
 public enum DateOrder {
-	ORDER_DYM, ORDER_DMY, ORDER_MDY, ORDER_MYD, ORDER_YDM, ORDER_YMD;
+	ORDER_DMY, ORDER_MDY, ORDER_YMD;
 }

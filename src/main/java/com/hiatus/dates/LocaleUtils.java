@@ -295,25 +295,15 @@ public final class LocaleUtils
 	{
 		final SimpleDateFormat theFmt = (SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT, inLocale);
 		final String thePattern = theFmt.toPattern().toLowerCase(Locale.UK); // simple Lowercase
-		final int theLoc_D = thePattern.indexOf('d');
 		final int theLoc_M = thePattern.indexOf('m');
-		final int theLoc_Y = thePattern.indexOf('y');
 
-		if (theLoc_D < theLoc_Y && theLoc_Y < theLoc_M) {
-			return ORDER_DYM;
-		} else if (theLoc_D < theLoc_M && theLoc_M < theLoc_Y) {
+		if (thePattern.indexOf('d') < theLoc_M) {
 			return ORDER_DMY;
-		} else if (theLoc_Y < theLoc_D && theLoc_D < theLoc_M) {
-			return ORDER_YDM;
-		} else if (theLoc_Y < theLoc_M && theLoc_M < theLoc_D) {
+		} else if (thePattern.indexOf('y') < theLoc_M) {
 			return ORDER_YMD;
-		} else if (theLoc_M < theLoc_D && theLoc_D < theLoc_Y) {
-			return ORDER_MDY;
-		} else if (theLoc_M < theLoc_Y && theLoc_Y < theLoc_D) {
-			return ORDER_MYD;
-		} else {
-			return ORDER_DYM;
 		}
+
+		return ORDER_MDY;
 	}
 
 	/*******************************************************************************
@@ -367,15 +357,9 @@ public final class LocaleUtils
 
 		if (theOrder == ORDER_DMY) {
 			ioBuf.append(inDBuf).append(inMBuf).append(inYBuf);
-		} else if (theOrder == ORDER_DYM) {
-			ioBuf.append(inDBuf).append(inYBuf).append(inMBuf);
 		} else if (theOrder == ORDER_MDY) {
 			ioBuf.append(inMBuf).append(inDBuf).append(inYBuf);
-		} else if (theOrder == ORDER_MYD) {
-			ioBuf.append(inMBuf).append(inYBuf).append(inDBuf);
-		} else if (theOrder == ORDER_YDM) {
-			ioBuf.append(inYBuf).append(inDBuf).append(inMBuf);
-		} else if (theOrder == ORDER_YMD) {
+		} else /* Can only be ORDER_YMD */{
 			ioBuf.append(inYBuf).append(inMBuf).append(inDBuf);
 		}
 	}
