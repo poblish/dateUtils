@@ -17,7 +17,7 @@ import java.util.TimeZone;
  * @author andrewregan
  * 
  */
-public class DateUtils implements DateConstants
+public final class DateUtils implements DateConstants
 {
 	private DateUtils() {
 	}
@@ -90,7 +90,7 @@ public class DateUtils implements DateConstants
 
 	/*******************************************************************************
 	 *******************************************************************************/
-	public static boolean EqualDates( final java.sql.Date inA, final java.sql.Date inB)
+	public static boolean equalDates( final java.sql.Date inA, final java.sql.Date inB)
 	{
 		final Calendar theCalendarA = Calendar.getInstance();
 		final Calendar theCalendarB = Calendar.getInstance();
@@ -142,8 +142,8 @@ public class DateUtils implements DateConstants
 	 *******************************************************************************/
 	public static double getCalendarDifference_Years( final java.util.GregorianCalendar inCal_A, final java.util.GregorianCalendar inCal_B)
 	{
-		final int doyA = inCal_A.get(Calendar.DAY_OF_YEAR);
-		final int doyB = inCal_B.get(Calendar.DAY_OF_YEAR);
+		final int doyA = inCal_A.get(DAY_OF_YEAR);
+		final int doyB = inCal_B.get(DAY_OF_YEAR);
 		final int theYear_A = inCal_A.get(YEAR);
 		final int theYear_B = inCal_B.get(YEAR);
 
@@ -153,7 +153,7 @@ public class DateUtils implements DateConstants
 		}
 		else
 		{
-			final double theFractBit = ((double) Math.abs(doyA - doyB)) / (double) inCal_A.getActualMaximum(Calendar.DAY_OF_YEAR);
+			final double theFractBit = ((double) Math.abs(doyA - doyB)) / (double) inCal_A.getActualMaximum(DAY_OF_YEAR);
 
 			if (theYear_A == theYear_B)
 			{
@@ -185,7 +185,7 @@ public class DateUtils implements DateConstants
 
 	/*******************************************************************************
 	 *******************************************************************************/
-	private static int getAgeIfBirthdayToday( final Calendar inBirthCalendar, final Calendar inTodaysCalendar)
+	public static int getAgeIfBirthdayToday( final Calendar inBirthCalendar, final Calendar inTodaysCalendar)
 	{
 		if ((inTodaysCalendar.get(DAY_OF_MONTH) == inBirthCalendar.get(DAY_OF_MONTH)) && (inTodaysCalendar.get(MONTH) == inBirthCalendar.get(MONTH)))
 		{

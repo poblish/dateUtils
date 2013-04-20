@@ -3,7 +3,6 @@
 package com.hiatus.dates;
 
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -238,19 +237,13 @@ public class ULocale2
 	*******************************************************************************/
 	public static Locale stringToLocale( final String inString)
 	{
-		if ((inString != null) && (inString.length() >= 2))
+		if ( inString != null && inString.length() >= 2)
 		{
-			try
-			{
-				final String theLang = inString.substring(0, 2);
-				final int thePos = inString.indexOf("-");
-				final String theCountry = (thePos >= 0) ? inString.substring(thePos + 1) : "";
+			final String theLang = inString.substring(0, 2);
+			final int thePos = inString.indexOf("-");
+			final String theCountry = (thePos >= 0) ? inString.substring(thePos + 1) : "";
 
-				return new Locale(theLang, theCountry);
-			} catch (final Exception err)
-			{
-				// Ignore
-			}
+			return new Locale(theLang, theCountry);
 		}
 
 		return Locale.US;
@@ -263,8 +256,6 @@ public class ULocale2
 	{
 		final String theLang = inLocale.getLanguage();
 		final String theCountry = inLocale.getCountry();
-
-		// println("lang \"" + theLang + "\", country \"" + inCountry + "\", theID = \"" + theID + "\".");
 
 		return getBestTimeZoneString(theLang, theCountry);
 	}
@@ -301,16 +292,8 @@ public class ULocale2
 		return new GregorianCalendar(getBestTimeZone(inLocale), inLocale);
 	}
 
-	/*******************************************************************************
-	 ******************************************************************************* 
-	 public static void PrintOutLocales() { Locale theDefaultLocale = Locale.getDefault(); Locale[] theLocalesList =
-	 * LocaleData.getAvailableLocales("Countries");
-	 * 
-	 * for ( int i = 0; i < theLocalesList.length; i++) { info( i + " ... " +
-	 * theLocalesList[i].getDisplayCountry(theDefaultLocale) + ", " +
-	 * theLocalesList[i].getDisplayLanguage(theDefaultLocale) + " (" + theLocalesList[i] + ")"); } }/
-	 * 
-	 * /*********************************************************************************** 2 August 2001
+	/***********************************************************************************
+	 * 2 August 2001
 	 ***********************************************************************************/
 	public static int getLocaleDateOrder( final Locale inLocale)
 	{
@@ -379,8 +362,8 @@ public class ULocale2
 	/*******************************************************************************
 	 * 2 August 2001
 	 *******************************************************************************/
-	public static void joinDateEntryParts( final Locale inLocale, final StringBuffer ioBuf,
-					final StringBuffer inDBuf, final StringBuffer inMBuf, final StringBuffer inYBuf)
+	public static void joinDateEntryParts( final Locale inLocale, final StringBuilder ioBuf,
+					final StringBuilder inDBuf, final StringBuilder inMBuf, final StringBuilder inYBuf)
 	{
 		final int theOrder = getLocaleDateOrder(inLocale);
 
@@ -396,21 +379,6 @@ public class ULocale2
 			ioBuf.append(inYBuf).append(inDBuf).append(inMBuf);
 		} else if (theOrder == ORDER_YMD) {
 			ioBuf.append(inYBuf).append(inMBuf).append(inDBuf);
-		}
-	}
-
-	/*******************************************************************************
-	 * Note: From 1st November 2000 we display and treat all money amounts in US$, to save ourselves the hassle of
-	 * converting currencies.
-	 *******************************************************************************/
-	public static NumberFormat getClientCurrencyFormat()
-	{
-		try
-		{
-			return NumberFormat.getCurrencyInstance(Locale.US);
-		} catch (final Exception err)
-		{
-			return NumberFormat.getCurrencyInstance();
 		}
 	}
 }
