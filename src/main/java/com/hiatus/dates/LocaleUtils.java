@@ -279,6 +279,10 @@ public final class LocaleUtils
 	 *******************************************************************************/
 	public static TimeZone getBestTimeZone( final Locale inLocale)
 	{
+		if (inLocale == null) {
+			return TimeZone.getDefault();
+		}
+
 		return TimeZone.getTimeZone(getBestTimeZoneStr(inLocale));
 	}
 

@@ -4,7 +4,6 @@ import static java.util.Calendar.*;
 
 import java.sql.Timestamp;
 import java.text.DateFormatSymbols;
-import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -20,14 +19,6 @@ import java.util.TimeZone;
 public final class DateUtils implements DateConstants
 {
 	private DateUtils() {
-	}
-
-	private static NumberFormat SECONDS_FORMAT;
-
-	static
-	{
-		SECONDS_FORMAT = NumberFormat.getNumberInstance(Locale.UK);
-		SECONDS_FORMAT.setMaximumFractionDigits(3);
 	}
 
 	/*******************************************************************************
@@ -148,7 +139,7 @@ public final class DateUtils implements DateConstants
 		}
 		else
 		{
-			final double theFractBit = (double) Math.abs(doyA - doyB) / (double) inCal_A.getActualMaximum(DAY_OF_YEAR);
+			final double theFractBit = (double) Math.abs(doyA - doyB) / (double) DAYS_IN_YEAR;
 
 			if (theYear_A == theYear_B)
 			{
@@ -254,122 +245,6 @@ public final class DateUtils implements DateConstants
 		final DateFormatSymbols theSymbols = new DateFormatSymbols(inLocale);
 
 		return theSymbols.getMonths()[inIndex];
-	}
-
-	public static String getFormattedTimeDiff( final long inDiffMSecs) {
-		return getFormattedTimeDiff(inDiffMSecs, true, true);
-	}
-
-	public static String getFormattedTimeNanosDiff( final long inDiffNanos) {
-		return getFormattedTimeNanosDiff(inDiffNanos, true, true);
-	}
-
-	public static String getFormattedTimeNanosDiff( final long inDiffNanos, final boolean inUseSeconds, final boolean inUseMSecs) {
-		if (inDiffNanos < 1000L) {
-			return new StringBuilder(11).append(inDiffNanos).append(" nanos").toString();
-		}
-
-		final long theMicros = inDiffNanos / 1000L;
-
-		if (theMicros < 1000L) {
-			return new StringBuilder(11).append(theMicros).append(" micros").toString();
-		}
-
-		return getFormattedTimeDiff(theMicros / 1000L, inUseSeconds, inUseMSecs);
-	}
-
-	/*******************************************************************************
-	 *******************************************************************************/
-	public static String getFormattedTimeDiff( final long inDiffMSecs, final boolean inUseSeconds, final boolean inUseMSecs)
-	{
-		final StringBuilder theBuf = new StringBuilder(200);
-
-		if (inDiffMSecs >= 1000L)
-		{
-			double theSecs = inDiffMSecs / 1000.0D;
-
-			if (theSecs >= 60.0D)
-			{
-				long theMins = (long) (theSecs / 60L);
-
-				theSecs -= theMins * 60L;
-
-				if (theMins >= 60L)
-				{
-					long theHrs = theMins / 60L;
-
-					theMins %= 60L;
-
-					if (theHrs >= 24L)
-					{
-						final long theDays = theHrs / 24L;
-
-						if (theDays == 1L)
-						{
-							theBuf.append("1 day");
-						}
-						else {
-							theBuf.append(theDays).append(" days");
-						}
-
-						theHrs %= 24L;
-					}
-
-					if (theHrs >= 1L && theBuf.length() > 0)
-					{
-						theBuf.append(", ");
-					}
-
-					if (theHrs == 1L)
-					{
-						theBuf.append("1 hour");
-					}
-					else if (theHrs > 1L)
-					{
-						theBuf.append(theHrs).append(" hrs");
-					}
-
-				}
-
-				if (theMins >= 1L && theBuf.length() > 0)
-				{
-					theBuf.append(", ");
-				}
-
-				if (theMins == 1L)
-				{
-					theBuf.append("1 minute");
-				}
-				else if (theMins > 1L)
-				{
-					theBuf.append(theMins).append(" mins");
-				}
-
-			}
-
-			if (inUseSeconds && theSecs > 0.0D)
-			{
-				if (theBuf.length() > 0)
-				{
-					theBuf.append(", ");
-				}
-
-				if (inUseMSecs)
-				{
-					theBuf.append(SECONDS_FORMAT.format(theSecs)).append(" secs");
-				}
-				else {
-					theBuf.append(Integer.toString((int) theSecs)).append(" secs");
-				}
-			}
-
-		}
-		else if (inUseMSecs)
-		{
-			theBuf.append(inDiffMSecs).append(" msecs");
-		}
-
-		return theBuf.toString();
 	}
 
 	/*******************************************************************************
